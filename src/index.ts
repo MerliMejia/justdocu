@@ -1,4 +1,5 @@
 import { createServer } from "http";
+import * as fs from "fs";
 
 const server = createServer((req, res) => {
   //   res.end();
@@ -9,17 +10,13 @@ server.on("clientError", (err, socket) => {
 
 server.on("request", (req, res) => {
   console.log(req.url);
-  if (req.url === "/merli?query1=value1") {
-    console.log("?????");
-    res.writeHead(400, "Merli nop", {
-      maHeader: "Ma header value",
-    });
-    const jsonBody = {
-      data: "This is a json body.",
-    };
-    res.write(JSON.stringify(jsonBody));
-    res.end();
-  }
+  console.log("?????");
+  res.writeHead(200);
+
+  const index = fs.readFileSync("tsDist/frontend/index.html");
+
+  res.write(index);
+  res.end();
 });
 
 server.listen(8000);
