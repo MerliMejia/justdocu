@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import * as fs from "fs";
-import { DbGetData } from "./db";
+import { DbGetData, DbSaveData } from "./db";
 
 const server = createServer((req, res) => {
   //   res.end();
@@ -9,7 +9,7 @@ server.on("clientError", (err, socket) => {
   socket.end("HTTP/1.1 400 Bad Request\r\n\r\n");
 });
 
-server.on("request", (req, res) => {
+server.on("request", async (req, res) => {
   console.log(req.url);
 
   const fileExtensionArray = req.url?.split(".");
@@ -39,16 +39,28 @@ server.on("request", (req, res) => {
     res.write(fileBuffer);
     res.end();
   } else if (req.url === "/items") {
-    if (req.method !== "GET") {
-      res.writeHead(400);
-      res.write("BAD MATHOD");
-      res.end();
-    } else {
+    if (req.method === "GET") {
       const data = DbGetData();
       res.writeHead(200, "", {
         "Content-Type": "text/json; charset=utf-8",
       });
       res.write(JSON.stringify(data));
+      res.end();
+    } else if (req.method === "POST") {
+      const body: DbItemType = await new Promise((resolve, reject) => {
+        let data: string = "";
+        req.addListener("data", (chunk: Buffer) => {
+          data = chunk.toString();
+          resolve(JSON.parse(data));
+        });
+      });
+
+      const currentData = DbGetData();
+      currentData.items.push(body);
+
+      DbSaveData(currentData);
+
+      res.writeHead(200);
       res.end();
     }
   } else {
