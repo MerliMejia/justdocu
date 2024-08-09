@@ -1,5 +1,6 @@
 import { createServer } from "http";
 import * as fs from "fs";
+import { DbGetData } from "./db";
 
 const server = createServer((req, res) => {
   //   res.end();
@@ -37,7 +38,20 @@ server.on("request", (req, res) => {
     res.writeHead(200);
     res.write(fileBuffer);
     res.end();
-  }else{
+  } else if (req.url === "/items") {
+    if (req.method !== "GET") {
+      res.writeHead(400);
+      res.write("BAD MATHOD");
+      res.end();
+    } else {
+      const data = DbGetData();
+      res.writeHead(200, "", {
+        "Content-Type": "text/json; charset=utf-8",
+      });
+      res.write(JSON.stringify(data));
+      res.end();
+    }
+  } else {
     res.writeHead(404);
     res.end();
   }
