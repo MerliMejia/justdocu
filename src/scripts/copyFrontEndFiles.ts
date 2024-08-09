@@ -1,8 +1,10 @@
 import * as fs from "fs";
-import * as url from "url";
+import { ExecutableScript } from "./utils";
+
+export const executable = new ExecutableScript();
 
 const copyIndex = () => {
   fs.copyFileSync("src/frontend/index.html", "tsDist/frontend/index.html");
 };
 
-copyIndex();
+executable.actions.push(copyIndex);
