@@ -3,8 +3,9 @@ import { ExecutableScript } from "./utils";
 
 export const executable = new ExecutableScript();
 
-const copyIndex = () => {
+const copyIndexes = () => {
   fs.copyFileSync("src/frontend/index.html", "tsDist/frontend/index.html");
+  fs.copyFileSync("src/frontend/index.css", "tsDist/frontend/index.css");
 };
 
-executable.actions.push(copyIndex);
+executable.actions.push(copyIndexes);

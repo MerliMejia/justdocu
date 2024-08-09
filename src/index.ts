@@ -10,13 +10,37 @@ server.on("clientError", (err, socket) => {
 
 server.on("request", (req, res) => {
   console.log(req.url);
-  console.log("?????");
-  res.writeHead(200);
 
-  const index = fs.readFileSync("tsDist/frontend/index.html");
+  const fileExtensionArray = req.url?.split(".");
+  console.log("fileExtensionArray", fileExtensionArray);
 
-  res.write(index);
-  res.end();
+  if (fileExtensionArray && fileExtensionArray.length > 1) {
+    const fileName = fileExtensionArray[0];
+    const fileExtension = fileExtensionArray[1];
+
+    const filePath = `tsDist/frontend${fileName}.${fileExtension}`;
+
+    console.log("FILE: ", filePath);
+
+    try {
+      const fileBuffer = fs.readFileSync(filePath);
+      res.writeHead(200);
+      res.write(fileBuffer);
+      res.end();
+    } catch (error) {
+      res.writeHead(404);
+      res.end();
+    }
+  } else if (req.url === "/") {
+    const fileBuffer = fs.readFileSync("tsDist/frontend/index.html");
+
+    res.writeHead(200);
+    res.write(fileBuffer);
+    res.end();
+  }else{
+    res.writeHead(404);
+    res.end();
+  }
 });
 
 server.listen(8000);
